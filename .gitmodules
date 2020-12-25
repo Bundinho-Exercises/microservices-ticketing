@@ -1,3 +1,6 @@
 [submodule "common"]
 	path = common
 	url = https://github.com/Bundinho-Exercises/microservices-ticketing-common.git
+[submodule "tickets"]
+	path = tickets
+	url = https://github.com/Bundinho-Exercises/microservices-ticketing-tickets.git
