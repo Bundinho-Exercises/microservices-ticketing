@@ -15,25 +15,7 @@ stan.on('connect', () => {
         process.exit();
     });
 
-    const options = stan.subscriptionOptions()
-        .setManualAckMode(true)
-        .setDeliverAllAvailable()
-        .setDurableName('accounting-service');
-    const subscription = stan.subscribe(
-        'ticket:created',
-        'orders-service-queue-group',
-        options
-    );
-
-    subscription.on('message', (msg: Message) => {
-        const data = msg.getData();
-
-        if (typeof data === 'string') {
-            console.log(`Received event #${msg.getSequence()}, with data: ${data}`);
-        }
-
-        msg.ack();
-    });
+    new TickedCreatedListener(stan).listen();
 });
 
 process.on('SIGINT', () => stan.close());
@@ -69,7 +51,7 @@ abstract class Listener {
 
         subscription.on('message', (msg: Message) => {
             console.log(
-                `Message received: ${this.subscriptionOptions} / ${this.queueGroupName}`
+                `Message received: ${this.subject} / ${this.queueGroupName}`
             );
 
             const parsedData = this.parseMessage(msg);
@@ -85,4 +67,16 @@ abstract class Listener {
         ? JSON.parse(data)
         : JSON.parse(data.toString('utf8'));
     }
+}
+
+class TickedCreatedListener extends Listener {
+    subject = 'ticket:created';
+    queueGroupName = 'payments-service';
+
+    onMessage(data: any, msg: nats.Message): void {
+        console.log('Event data!', data);
+
+        msg.ack();
+    }
+    
 }
