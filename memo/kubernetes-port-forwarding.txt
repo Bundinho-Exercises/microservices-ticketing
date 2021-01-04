@@ -1,1 +1,1 @@
-kubectl port-forward nats-depl-64b787b548-fp8bs 4222:4222
+kubectl port-forward nats-depl-c4bbc9c94-tw94n 4222:4222
